@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import axios from "axios";
 import { Link } from "react-router-dom"
 import {
   Box,
@@ -36,14 +37,27 @@ const Login = ({ onLogin }) => {
     event.preventDefault()
   }
 
-  const handleLogin = () => {
-    const isValidEmail = validateEmail(email)
-    const isValidPassword = validatePassword(password)
 
+   const handleLogin = () => {
+    const isValidEmail = validateEmail(email);
+    const isValidPassword = validatePassword(password);
+  
     if (isValidEmail && isValidPassword) {
-      onLogin(true) // Set authentication to true
+      // Check if the user exists
+      axios.get(`https://5000-wormy505-planning-m3oqqph60yj.ws-us99.gitpod.io/api/users/${email}`).then((response) => {
+          const userExists = response.data.exists;
+          if (userExists) {
+            onLogin(true); // Set authentication to true
+          } else {
+            console.log("User does not exist");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-  }
+  };
+
 
   const handleRememberMeChange = (event) => {
     setRememberMe(event.target.checked)
